@@ -72,6 +72,44 @@
   .seg button[aria-pressed="true"]{background:var(--ink); color:var(--paper)}
   .seg button:focus-visible, select:focus-visible, .price-in:focus-visible, a:focus-visible{outline:3px solid var(--biltema); outline-offset:2px}
   label.sel{font-family:'IBM Plex Mono',monospace; font-size:13px; color:var(--ink-soft); display:flex; align-items:center; gap:8px}
+  /* dual-handle width slider */
+  .wcontrol{display:flex; flex-direction:column; gap:0; user-select:none; min-width:250px}
+  .wlab-title{font-family:'IBM Plex Mono',monospace; font-size:13px; color:var(--ink-soft); display:flex; align-items:center; gap:6px}
+  .wlab-title b{color:var(--ink); font-weight:600}
+  #w-all{
+    appearance:none; cursor:pointer; padding:1px 8px; font-family:'IBM Plex Mono',monospace; font-size:11px;
+    border:1px solid var(--ink); border-radius:99px; background:var(--card); color:var(--ink);
+  }
+  #w-all:hover{background:var(--ink); color:var(--paper)}
+  #w-all:focus-visible{outline:3px solid var(--biltema); outline-offset:2px}
+  #w-all:disabled{opacity:.35; cursor:default; background:var(--card); color:var(--ink)}
+  #sortdir{
+    appearance:none; cursor:pointer; padding:5px 10px; font-size:12px;
+    border:1px solid var(--ink); border-radius:6px; background:var(--card); color:var(--ink);
+  }
+  #sortdir:hover, #sortdir[aria-pressed="true"]{background:var(--ink); color:var(--paper)}
+  #sortdir:focus-visible{outline:3px solid var(--biltema); outline-offset:2px}
+  .wwrap{position:relative; height:26px}
+  .wwrap::before{content:''; position:absolute; left:0; right:0; top:12px; height:3px; background:var(--line); border-radius:2px}
+  #w-range{position:absolute; top:12px; height:3px; background:var(--ink); border-radius:2px; pointer-events:none}
+  .wwrap input[type=range]{
+    position:absolute; left:0; top:0; width:100%; height:26px; margin:0;
+    -webkit-appearance:none; appearance:none; background:transparent; pointer-events:none;
+  }
+  .wwrap input[type=range]::-webkit-slider-runnable-track{height:26px; background:transparent}
+  .wwrap input[type=range]::-webkit-slider-thumb{
+    -webkit-appearance:none; pointer-events:auto; width:16px; height:16px; margin-top:5px;
+    border-radius:50%; background:var(--card); border:2px solid var(--ink); cursor:grab;
+  }
+  .wwrap input[type=range]::-moz-range-thumb{
+    pointer-events:auto; width:13px; height:13px;
+    border-radius:50%; background:var(--card); border:2px solid var(--ink); cursor:grab;
+  }
+  .wwrap input[type=range]:focus-visible{outline:none}
+  .wwrap input[type=range]:focus-visible::-webkit-slider-thumb{box-shadow:0 0 0 3px var(--biltema)}
+  .wwrap input[type=range]:focus-visible::-moz-range-thumb{box-shadow:0 0 0 3px var(--biltema)}
+  .wticks{position:relative; height:14px; font-family:'IBM Plex Mono',monospace; font-size:10px; color:var(--ink-soft)}
+  .wticks span{position:absolute; transform:translateX(-50%); cursor:pointer}
   select{
     font-family:'IBM Plex Mono',monospace; font-size:13px; padding:8px 10px;
     border:1px solid var(--ink); border-radius:6px; background:var(--card); color:var(--ink);
@@ -153,7 +191,14 @@
   .k-layout{display:grid; grid-template-columns:280px 1fr; gap:18px; margin-top:22px}
   @media(max-width:760px){ .k-layout{grid-template-columns:1fr} }
   .k-inputs{background:var(--card); border:1px solid var(--line); border-radius:8px; padding:16px 18px; align-self:start}
-  .k-inputs h3, .k-card h3{margin:0 0 10px; font-family:'Bricolage Grotesque',sans-serif; font-size:16px; font-weight:700}
+  .k-inputs h3, .k-card h3{margin:0 0 10px; font-family:'Bricolage Grotesque',sans-serif; font-size:16px; font-weight:700; display:flex; align-items:center; justify-content:space-between; gap:10px}
+  #k-comp{
+    appearance:none; cursor:pointer; padding:2px 10px; font-family:'IBM Plex Mono',monospace; font-size:11px; font-weight:400;
+    border:1px solid var(--ink); border-radius:99px; background:var(--card); color:var(--ink);
+  }
+  #k-comp:hover{background:var(--ink); color:var(--paper)}
+  #k-comp[aria-pressed="true"]{background:var(--ink); color:var(--paper)}
+  #k-comp:focus-visible{outline:3px solid var(--biltema); outline-offset:2px}
   .k-inputs label{display:flex; justify-content:space-between; align-items:center; gap:10px; font-family:'IBM Plex Mono',monospace; font-size:13px; padding:6px 0; border-top:1px dashed var(--line)}
   .k-inputs label:first-of-type{border-top:none}
   .k-inputs input[type=number]{
@@ -175,6 +220,9 @@
   table.k-table td.num{text-align:right; white-space:nowrap}
   tr.k-win td{background:#eaf4ec}
   .k-warn{margin-top:10px; padding:10px 12px; border:1px solid var(--jula); border-radius:6px; color:var(--jula); font-size:13px}
+  .k-sub{font-family:'Archivo',sans-serif; font-size:11px; color:var(--ink-soft); margin:2px 0}
+  tr.has-alt td{border-bottom:none}
+  tr.k-alt td{border-top:1px dotted var(--ink-soft)}
 </style>
 </head>
 <body>
@@ -191,7 +239,7 @@
 
   <nav class="tabs" aria-label="Sections">
     <button data-tab="compare" aria-pressed="true">Compare boards</button>
-    <button data-tab="kallax" aria-pressed="false">Kallax planner</button>
+    <button data-tab="kallax" aria-pressed="false">Shelving planner</button>
   </nav>
 
   <section id="tab-compare">
@@ -229,16 +277,23 @@
       <button data-group="wood" aria-pressed="true">By wood</button>
       <button data-group="flat" aria-pressed="false">One list</button>
     </div>
-    <label class="sel">width
-      <select id="width"></select>
-    </label>
+    <div class="wcontrol" id="wcontrol" title="Drag the handles · double-click to pick one width">
+      <span class="wlab-title"><button id="w-all" type="button" title="Select the full width range">all</button> width: <b id="wlab">all widths</b></span>
+      <div class="wwrap" id="wwrap">
+        <div id="w-range"></div>
+        <input type="range" id="w-min" min="0" max="9" step="1" value="0" aria-label="Width range handle 1 (either end)">
+        <input type="range" id="w-max" min="0" max="9" step="1" value="9" aria-label="Width range handle 2 (either end)">
+      </div>
+      <div class="wticks" id="wticks"></div>
+    </div>
     <label class="sel">sort
       <select id="sort">
-        <option value="sqm">kr / m² (cheapest first)</option>
-        <option value="price">price (lowest first)</option>
-        <option value="area">size (smallest first)</option>
+        <option value="sqm">kr / m²</option>
+        <option value="price">price</option>
+        <option value="area">size (area)</option>
         <option value="length">length</option>
       </select>
+      <button id="sortdir" type="button" aria-pressed="false" aria-label="Toggle sort direction" title="Toggle ascending / descending">▲</button>
     </label>
   </div>
 
@@ -258,7 +313,7 @@
         </label>
         <label>opening width (cm) <input id="k-ow" type="number" min="5" max="120" step="0.5" value="33"></label>
         <label>opening height (cm) <input id="k-oh" type="number" min="5" max="120" step="0.5" value="33"></label>
-        <label>divisions · top / side
+        <label>divisions top/side
           <span class="duo"><input id="k-tdiv" type="number" min="0" max="5" step="1" value="1" aria-label="Top-section dividers (0 to 5)"><input id="k-sdiv" type="number" min="0" max="5" step="1" value="2" aria-label="Side-column shelves (0 to 5)"></span>
         </label>
         <label>wood
@@ -267,7 +322,7 @@
         <label>depth = board width
           <select id="k-depth"></select>
         </label>
-        <p class="k-hint">Each pair works both ways: the field you edited last (solid border) governs, the other (dashed) shows the result. A count sets the total cm; a total cm computes the count as ⌊(total − 1,8) / (opening + 1,8)⌋ with spare cm reported — spare <em>height</em> of ≥ 1 cm usable opening becomes a shorter top section with 0–5 evenly spaced dividers, and spare <em>width</em> becomes a narrow full-height side column with 0–5 evenly spaced shelves (the "divisions" inputs above). Construction: top and bottom boards run the full outer width; the sides stand on the bottom board, sandwiched under the top for rigidity; middle shelves fit between the sides; short dividers fill each row. Boards are 1,8&nbsp;cm thick; the shopping plan reserves a 3&nbsp;mm saw kerf per cut. IKEA's Kallax opening is ≈33×33&nbsp;cm at 39&nbsp;cm depth, so 40&nbsp;cm boards are the closest match.</p>
+        <p class="k-hint">Each pair works both ways: the field you edited last (solid border) governs, the other (dashed) shows the result. A count sets the total cm; a total cm computes the count as ⌊(total − 1,8) / (opening + 1,8)⌋ with spare cm reported — spare <em>height</em> of ≥ 1 cm usable opening becomes a shorter top section with 0–5 evenly spaced dividers, and spare <em>width</em> becomes a narrow full-height side column with 0–5 evenly spaced shelves (the "divisions" inputs above). Construction: top and bottom boards run the full outer width; the sides stand on the bottom board, sandwiched under the top for rigidity; middle shelves fit between the sides; short dividers fill each row. Board thickness follows the chosen depth (1,8&nbsp;cm for most widths; a few only exist in 1,5 or 2,7&nbsp;cm, noted in the dropdown); the shopping plan reserves a 3&nbsp;mm saw kerf per cut. IKEA's Kallax opening is ≈33×33&nbsp;cm at 39&nbsp;cm depth, so 40&nbsp;cm boards are the closest match.</p>
       </div>
 
       <div>
@@ -283,7 +338,7 @@
         </div>
 
         <div class="k-card">
-          <h3>Cheapest boards to buy · per store</h3>
+          <h3>Cheapest boards to buy · per store <button id="k-comp" type="button" aria-pressed="false" title="Show single-length and best-kr/m² alternatives with offcut estimates">comprehensive</button></h3>
           <table class="k-table" id="k-shop"></table>
           <div id="k-note" class="k-hint"></div>
         </div>
@@ -424,8 +479,9 @@ const DATA = [
 DATA.forEach((d,i)=>d.id=i);
 
 /* state kept in memory only */
-const state = { wood:'all', store:'all', width:'all', sort:'sqm', group:'wood', prices:{} };
-const matchesWidth = d => state.width==='all' || d.w===+state.width;
+const WIDTHVALS = [...new Set(DATA.map(d=>d.w))].sort((a,b)=>a-b);
+const state = { wood:'all', store:'all', wLo:0, wHi:WIDTHVALS.length-1, sort:'sqm', dir:1, group:'wood', prices:{} };
+const matchesWidth = d => d.w>=WIDTHVALS[state.wLo] && d.w<=WIDTHVALS[state.wHi];
 
 const fmt = n => n>=100 ? Math.round(n).toLocaleString('nb-NO') : n.toFixed(2).replace('.',',').replace(',00','');
 const priceOf = d => d.price ?? state.prices[d.id] ?? null;
@@ -439,12 +495,14 @@ const woodSwatch={pine:'var(--pine-b)', oak:'var(--oak-b)', beech:'var(--beech-b
 const woodTag={pine:'furu · pine', oak:'eik · oak', beech:'bøk · beech'};
 
 function sortRows(rows){
-  const s = state.sort;
+  const s = state.sort, dir = state.dir;
   return rows.slice().sort((a,b)=>{
-    if(s==='sqm'){ const A=sqm(a)??1e9, B=sqm(b)??1e9; return A-B; }
-    if(s==='price'){ const A=priceOf(a)??1e9, B=priceOf(b)??1e9; return A-B; }
-    if(s==='area'){ return a.l*a.w - b.l*b.w; }
-    return a.l-b.l || a.w-b.w;
+    let c;
+    if(s==='sqm'){ c=(sqm(a)??1e9)-(sqm(b)??1e9); }
+    else if(s==='price'){ c=(priceOf(a)??1e9)-(priceOf(b)??1e9); }
+    else if(s==='area'){ c=a.l*a.w - b.l*b.w; }
+    else { c=a.l-b.l || a.w-b.w; }
+    return dir*c;
   });
 }
 
@@ -488,11 +546,11 @@ function render(){
       el.innerHTML=`
         <span class="storechip ${storeCls(d.store)}">${storeName(d.store)}</span>
         <div class="mid">
-          <div class="board-track"><div class="board ${d.wood}" style="width:${barW}%;height:${barH}px" title="${d.l}×${d.w} cm"></div></div>
+          <div class="board-track"><div class="board ${d.wood}" style="width:${barW}%;height:${barH}px" title="${d.l} × ${d.w} × ${String(d.t).replace('.',',')} cm"></div></div>
           <div class="dims">
             <span class="size">${d.l} × ${d.w} cm</span>
             <span class="tag wood-${d.wood}">${woodTag[d.wood]}</span>
-            ${d.t!==1.8?`<span class="tag">${String(d.t).replace('.',',')} cm thick</span>`:''}
+            <span class="tag">${String(d.t).replace('.',',')} cm thick</span>
             ${d.was?`<span class="tag sale">sale — was ${d.was},-</span>`:''}
             ${d.src?`<span class="tag">${d.src}</span>`:''}
           </div>
@@ -565,15 +623,51 @@ function setGroup(g){
 }
 document.getElementById('sort').addEventListener('change',e=>{
   state.sort=e.target.value;
-  if(state.sort==='price') setGroup('flat');   /* cheapest-first ranks all woods together */
+  if(state.sort==='price') setGroup('flat');   /* price sort ranks all woods together */
+  render();
+});
+document.getElementById('sortdir').addEventListener('click',()=>{
+  state.dir=-state.dir;
+  const b=document.getElementById('sortdir');
+  b.textContent = state.dir===1 ? '▲' : '▼';
+  b.setAttribute('aria-pressed', state.dir===-1);
   render();
 });
 
-/* width dropdown, built from the widths that actually exist */
-const widthSel = document.getElementById('width');
-widthSel.innerHTML = '<option value="all">all widths</option>' +
-  [...new Set(DATA.map(d=>d.w))].sort((a,b)=>a-b).map(w=>`<option value="${w}">${w} cm</option>`).join('');
-widthSel.addEventListener('change',e=>{state.width=e.target.value; render();});
+/* dual-handle width slider, snapping to the widths that actually exist */
+const wMinIn=document.getElementById('w-min'), wMaxIn=document.getElementById('w-max');
+wMinIn.max = wMaxIn.max = WIDTHVALS.length-1;
+wMaxIn.value = WIDTHVALS.length-1;
+document.getElementById('wticks').innerHTML =
+  WIDTHVALS.map((w,i)=>`<span style="left:${(i/(WIDTHVALS.length-1)*100).toFixed(2)}%">${w}</span>`).join('');
+function wSync(){
+  state.wLo=Math.min(+wMinIn.value,+wMaxIn.value);
+  state.wHi=Math.max(+wMinIn.value,+wMaxIn.value);
+  const n=WIDTHVALS.length-1, bar=document.getElementById('w-range');
+  bar.style.left=(state.wLo/n*100)+'%';
+  bar.style.width=((state.wHi-state.wLo)/n*100)+'%';
+  document.getElementById('wlab').textContent =
+    (state.wLo===0 && state.wHi===n) ? 'all widths'
+    : state.wLo===state.wHi ? WIDTHVALS[state.wLo]+' cm only'
+    : WIDTHVALS[state.wLo]+'–'+WIDTHVALS[state.wHi]+' cm';
+  document.getElementById('w-all').disabled = (state.wLo===0 && state.wHi===n);
+  render();
+}
+document.getElementById('w-all').addEventListener('click',()=>{
+  wMinIn.value = 0;
+  wMaxIn.value = WIDTHVALS.length-1;
+  wSync();
+});
+wMinIn.addEventListener('input', wSync);
+wMaxIn.addEventListener('input', wSync);
+document.getElementById('wcontrol').addEventListener('dblclick',e=>{
+  const r=document.getElementById('wwrap').getBoundingClientRect();
+  const i=Math.max(0, Math.min(WIDTHVALS.length-1,
+    Math.round((e.clientX-r.left)/r.width*(WIDTHVALS.length-1))));
+  wMinIn.value = wMaxIn.value = i;
+  wSync();
+});
+wSync();
 
 /* ================= tabs ================= */
 document.querySelectorAll('.tabs button').forEach(b=>b.addEventListener('click',()=>{
@@ -589,11 +683,18 @@ const KERF = 0.3;       /* saw kerf per cut, cm */
 const fmtLen = n => (Math.round(n*10)/10).toString().replace('.',',');
 const kEl = id => document.getElementById(id);
 
+function kThickness(wood, w){
+  const ts=[...new Set(DATA.filter(d=>d.wood===wood && d.w===w).map(d=>d.t))];
+  return ts.includes(1.8) ? 1.8 : Math.min(...ts);
+}
 function kDepthOptions(){
   const wood = kEl('k-wood').value;
-  const widths = [...new Set(DATA.filter(d=>d.wood===wood && d.t===T).map(d=>d.w))].sort((a,b)=>a-b);
+  const widths = [...new Set(DATA.filter(d=>d.wood===wood).map(d=>d.w))].sort((a,b)=>a-b);
   const cur = kEl('k-depth').value;
-  kEl('k-depth').innerHTML = widths.map(w=>`<option value="${w}">${w} cm</option>`).join('');
+  kEl('k-depth').innerHTML = widths.map(w=>{
+    const t=kThickness(wood,w);
+    return `<option value="${w}">${w} cm · ${String(t).replace('.',',')} cm thick</option>`;
+  }).join('');
   kEl('k-depth').value = widths.includes(+cur) ? cur : (widths.includes(40) ? '40' : widths[0]);
 }
 
@@ -601,35 +702,36 @@ const kMode = { col:'count', row:'count' };     /* which input of each pair was 
 
 function kGeometry(){
   const ow=+kEl('k-ow').value||1, oh=+kEl('k-oh').value||1;
+  const t = kThickness(kEl('k-wood').value, +kEl('k-depth').value) || T;
 
   let cols, leftoverW=0, sideW=0;
   if(kMode.col==='cm'){
     const W=+kEl('k-wtot').value||1;
-    cols=Math.max(1, Math.floor((W - T)/(ow + T)));
-    const rem=Math.max(0, W - (cols*ow + (cols+1)*T));
-    if(rem - T >= 1) sideW = rem - T;     /* remainder becomes a side column */
+    cols=Math.max(1, Math.floor((W - t)/(ow + t)));
+    const rem=Math.max(0, W - (cols*ow + (cols+1)*t));
+    if(rem - t >= 1) sideW = rem - T;     /* remainder becomes a side column */
     else leftoverW = rem;
   } else cols=+kEl('k-cols').value||1;
 
   let rows, leftoverH=0, topX=0;
   if(kMode.row==='cm'){
     const H=+kEl('k-htot').value||1;
-    rows=Math.max(1, Math.floor((H - T)/(oh + T)));
-    const rem=Math.max(0, H - (rows*oh + (rows+1)*T));
-    if(rem - T >= 1) topX = rem - T;      /* remainder becomes a split top section */
+    rows=Math.max(1, Math.floor((H - t)/(oh + t)));
+    const rem=Math.max(0, H - (rows*oh + (rows+1)*t));
+    if(rem - t >= 1) topX = rem - t;      /* remainder becomes a split top section */
     else leftoverH = rem;
   } else rows=+kEl('k-rows').value||1;
 
-  const innerW = cols*ow + (cols-1)*T;
-  const outerW = innerW + 2*T + (sideW ? sideW + T : 0);
-  const outerH = rows*oh + (rows+1)*T + (topX ? topX + T : 0);
-  const sideLen = outerH - 2*T;
+  const innerW = cols*ow + (cols-1)*t;
+  const outerW = innerW + 2*t + (sideW ? sideW + t : 0);
+  const outerH = rows*oh + (rows+1)*t + (topX ? topX + t : 0);
+  const sideLen = outerH - 2*t;
   const divVal = id => Math.min(5, Math.max(0, Math.round(+kEl(id).value||0)));
   let sideDivs = sideW ? divVal('k-sdiv') : 0;
-  while(sideDivs>0 && (sideLen - sideDivs*T)/(sideDivs+1) < 1) sideDivs--;   /* keep openings ≥1 cm */
+  while(sideDivs>0 && (sideLen - sideDivs*t)/(sideDivs+1) < 1) sideDivs--;   /* keep openings ≥1 cm */
   let topDivs = topX ? divVal('k-tdiv') : 0;
-  while(topDivs>0 && (innerW - topDivs*T)/(topDivs+1) < 1) topDivs--;        /* keep openings ≥1 cm */
-  return {cols, rows, ow, oh, innerW, outerW, outerH,
+  while(topDivs>0 && (innerW - topDivs*t)/(topDivs+1) < 1) topDivs--;        /* keep openings ≥1 cm */
+  return {t, cols, rows, ow, oh, innerW, outerW, outerH,
           sideLen, capLen:outerW,
           midShelves:rows-1+(topX?1:0), topX, topDivs, sideW, sideDivs, leftoverW, leftoverH};
 }
@@ -680,14 +782,16 @@ function kPlan(pieceList, boards){
     return {cost, buy};
   };
 
-  const plans=[];
+  const plans=[], singles=[];
   boards.forEach(b0=>{ if(b0.l < pieces[0]) return;                    /* single board type   */
-    const p=run(()=>b0); if(p) plans.push(p); });
+    const p=run(()=>b0); if(p){ plans.push(p); singles.push(p); } });
   [c=>c.reduce((a,b)=>a.price<b.price?a:b),                            /* cheapest that fits  */
    c=>c.reduce((a,b)=>a.price/a.l<b.price/b.l?a:b),                    /* best kr/cm that fits*/
    c=>c.reduce((a,b)=>a.l>b.l?a:b)                                     /* longest that fits   */
   ].forEach(pick=>{ const p=run(pick); if(p) plans.push(p); });
-  return plans.length ? plans.reduce((a,b)=>a.cost<=b.cost?a:b) : null;
+  if(!plans.length) return null;
+  const min=arr=>arr.reduce((a,b)=>a.cost<=b.cost?a:b);
+  return { best:min(plans), single: singles.length ? min(singles) : null };
 }
 
 function drawKallax(g){
@@ -700,24 +804,24 @@ function drawKallax(g){
   const fill = ({pine:'#e0bd7c', oak:'#a97a3e', beech:'#d9ac80'})[wood];
   const r=[];
   const rect=(x,y,w,h)=>r.push(`<rect x="${(pad+x*s).toFixed(1)}" y="${(pad+y*s).toFixed(1)}" width="${Math.max(w*s,1).toFixed(1)}" height="${Math.max(h*s,1).toFixed(1)}" fill="${fill}" stroke="rgba(0,0,0,.35)" stroke-width=".7"/>`);
-  rect(0,0,g.outerW,T); rect(0,g.outerH-T,g.outerW,T);                       /* top & bottom, full width */
-  rect(0,T,T,g.sideLen); rect(g.outerW-T,T,T,g.sideLen);                     /* sides, sandwiched        */
-  let y0=T;
+  rect(0,0,g.outerW,g.t); rect(0,g.outerH-g.t,g.outerW,g.t);                       /* top & bottom, full width */
+  rect(0,g.t,g.t,g.sideLen); rect(g.outerW-g.t,g.t,g.t,g.sideLen);                     /* sides, sandwiched        */
+  let y0=g.t;
   if(g.topX){
-    const opw = (g.innerW - g.topDivs*T)/(g.topDivs+1);
-    for(let k=1;k<=g.topDivs;k++) rect(T + k*opw + (k-1)*T, T, T, g.topX);   /* evenly spaced dividers   */
-    rect(T, T+g.topX, g.innerW, T);                                          /* shelf under top section  */
-    y0 = T + g.topX + T;
+    const opw = (g.innerW - g.topDivs*g.t)/(g.topDivs+1);
+    for(let k=1;k<=g.topDivs;k++) rect(g.t + k*opw + (k-1)*g.t, g.t, g.t, g.topX);   /* evenly spaced dividers   */
+    rect(g.t, g.t+g.topX, g.innerW, g.t);                                          /* shelf under top section  */
+    y0 = g.t + g.topX + g.t;
   }
   if(g.sideW){
-    const xw = T + g.innerW;                                                 /* side-column wall         */
-    rect(xw, T, T, g.sideLen);
-    const oph = (g.sideLen - g.sideDivs*T)/(g.sideDivs+1);
-    for(let k=1;k<=g.sideDivs;k++) rect(xw+T, T + k*oph + (k-1)*T, g.sideW, T);
+    const xw = g.t + g.innerW;                                                 /* side-column wall         */
+    rect(xw, g.t, g.t, g.sideLen);
+    const oph = (g.sideLen - g.sideDivs*g.t)/(g.sideDivs+1);
+    for(let k=1;k<=g.sideDivs;k++) rect(xw+g.t, g.t + k*oph + (k-1)*g.t, g.sideW, g.t);
   }
-  for(let k=1;k<g.rows;k++) rect(T, y0 + k*(g.oh+T) - T, g.innerW, T);       /* middle shelves           */
+  for(let k=1;k<g.rows;k++) rect(g.t, y0 + k*(g.oh+g.t) - g.t, g.innerW, g.t);       /* middle shelves           */
   for(let row=0;row<g.rows;row++) for(let c=1;c<g.cols;c++)                  /* dividers                 */
-    rect(T + c*g.ow + (c-1)*T, y0 + row*(g.oh+T), T, g.oh);
+    rect(g.t + c*g.ow + (c-1)*g.t, y0 + row*(g.oh+g.t), g.t, g.oh);
   svg.innerHTML=r.join('');
 }
 
@@ -727,8 +831,9 @@ function renderKallax(){
   drawKallax(g);
   kEl('k-dims').textContent =
     `Outer: ${fmtLen(g.outerW)} × ${fmtLen(g.outerH)} cm · ${g.cols} column${g.cols>1?'s':''} × ${g.rows} row${g.rows>1?'s':''} of ${fmtLen(g.ow)} × ${fmtLen(g.oh)} cm openings`
-    + (g.topX ? ` · + a ${fmtLen(g.topX)} cm tall top section with ${g.topDivs} divider${g.topDivs===1?'':'s'} (${g.topDivs+1} opening${g.topDivs?'s':''} of ${fmtLen((g.innerW-g.topDivs*T)/(g.topDivs+1))} × ${fmtLen(g.topX)} cm)` : '')
-    + (g.sideW ? ` · + a ${fmtLen(g.sideW)} cm wide side column with ${g.sideDivs} shel${g.sideDivs===1?'f':'ves'} (${g.sideDivs+1} opening${g.sideDivs?'s':''} of ${fmtLen(g.sideW)} × ${fmtLen((g.sideLen-g.sideDivs*T)/(g.sideDivs+1))} cm)` : '')
+    + ` · ${String(g.t).replace('.',',')} cm boards`
+    + (g.topX ? ` · + a ${fmtLen(g.topX)} cm tall top section with ${g.topDivs} divider${g.topDivs===1?'':'s'} (${g.topDivs+1} opening${g.topDivs?'s':''} of ${fmtLen((g.innerW-g.topDivs*g.t)/(g.topDivs+1))} × ${fmtLen(g.topX)} cm)` : '')
+    + (g.sideW ? ` · + a ${fmtLen(g.sideW)} cm wide side column with ${g.sideDivs} shel${g.sideDivs===1?'f':'ves'} (${g.sideDivs+1} opening${g.sideDivs?'s':''} of ${fmtLen(g.sideW)} × ${fmtLen((g.sideLen-g.sideDivs*g.t)/(g.sideDivs+1))} cm)` : '')
     + (g.leftoverW ? ` · ${fmtLen(g.leftoverW)} cm spare width` : '')
     + (g.leftoverH ? ` · ${fmtLen(g.leftoverH)} cm spare height` : '');
 
@@ -737,31 +842,70 @@ function renderKallax(){
   const depth=+kEl('k-depth').value;
   const totalRun=pieces.reduce((a,p)=>a+p.qty*p.len,0);
   kEl('k-cuts').innerHTML =
-    `<tr><th>piece</th><th>qty</th><th>length</th><th>board width</th></tr>` +
-    pieces.map(p=>`<tr><td>${p.name}</td><td class="num">${p.qty}</td><td class="num">${fmtLen(p.len)} cm</td><td class="num">${depth} cm</td></tr>`).join('') +
+    `<tr><th>piece</th><th>qty</th><th>length</th><th>board w × t</th></tr>` +
+    pieces.map(p=>`<tr><td>${p.name}</td><td class="num">${p.qty}</td><td class="num">${fmtLen(p.len)} cm</td><td class="num">${depth} × ${String(g.t).replace('.',',')} cm</td></tr>`).join('') +
     `<tr><td><strong>Total to cut</strong></td><td class="num"><strong>${pieces.reduce((a,p)=>a+p.qty,0)}</strong></td><td class="num"><strong>${fmtLen(totalRun)} cm</strong></td><td></td></tr>`;
 
   /* shopping */
   const wood=kEl('k-wood').value;
   const rows=[];
   let anyPlan=false;
+  const fmtBuy = plan => [...plan.buy.entries()].map(([b,n])=>`${n} × ${b.l}×${b.w}×${String(b.t).replace('.',',')} (${fmt(b.price)} kr) <a class="plink" href="${b.url}" target="_blank" rel="noopener">↗</a>`).join('<br>');
   for(const s of ['B','J','O','X']){
-    const boards=DATA.filter(d=>d.store===s && d.wood===wood && d.w===depth && d.t===T && d.price);
+    const boards=DATA.filter(d=>d.store===s && d.wood===wood && d.w===depth && d.t===g.t && d.price);
     if(!boards.length){ rows.push({s, none:true}); continue; }
     const plan=kPlan(pieces, boards);
     if(!plan){ rows.push({s, tooShort:true, max:Math.max(...boards.map(b=>b.l))}); continue; }
     anyPlan=true;
-    rows.push({s, plan});
+    const rate = boards.reduce((a,b)=> a.price/a.l <= b.price/b.l ? a : b);   /* best kr/m² at this width */
+    const ratePlan = kPlan(pieces, [rate]);
+    rows.push({s, plan, rate, ratePlan: ratePlan ? ratePlan.best : null});
   }
-  const priced=rows.filter(r=>r.plan).sort((a,b)=>a.plan.cost-b.plan.cost);
-  const minCost=priced.length?priced[0].plan.cost:null;
+  const priced=rows.filter(r=>r.plan).sort((a,b)=>a.plan.best.cost-b.plan.best.cost);
+  const minCost=priced.length?priced[0].plan.best.cost:null;
   kEl('k-shop').innerHTML =
     `<tr><th>store</th><th>buy</th><th>total</th></tr>` +
-    rows.sort((a,b)=>(a.plan?a.plan.cost:1e9)-(b.plan?b.plan.cost:1e9)).map(r=>{
-      if(r.none) return `<tr><td><span class="store-${storeCls(r.s)}">${storeName(r.s)}</span></td><td colspan="2">no ${wood} boards in ${depth} cm width</td></tr>`;
+    rows.sort((a,b)=>(a.plan?a.plan.best.cost:1e9)-(b.plan?b.plan.best.cost:1e9)).map(r=>{
+      if(r.none) return `<tr><td><span class="store-${storeCls(r.s)}">${storeName(r.s)}</span></td><td colspan="2">no ${wood} boards in ${depth} cm × ${String(g.t).replace('.',',')} cm</td></tr>`;
       if(r.tooShort) return `<tr><td><span class="store-${storeCls(r.s)}">${storeName(r.s)}</span></td><td colspan="2">longest board (${r.max} cm) is shorter than a required piece</td></tr>`;
-      const buyTxt=[...r.plan.buy.entries()].map(([b,n])=>`${n} × ${b.l}×${b.w} (${fmt(b.price)} kr) <a class="plink" href="${b.url}" target="_blank" rel="noopener">↗</a>`).join('<br>');
-      return `<tr class="${r.plan.cost===minCost?'k-win':''}"><td><span class="store-${storeCls(r.s)}">${storeName(r.s)}</span>${r.plan.cost===minCost?' 🏆':''}</td><td>${buyTxt}</td><td class="num"><strong>${fmt(r.plan.cost)} kr</strong></td></tr>`;
+      const best=r.plan.best, single=r.plan.single;
+      const bestIsSingle = best.buy.size===1;
+      const win = best.cost===minCost ? ' k-win' : '';
+      if(!kComp) return `<tr class="${win}"><td><span class="store-${storeCls(r.s)}">${storeName(r.s)}</span>${win?' 🏆':''}</td>`
+        + `<td>${fmtBuy(best)}</td><td class="num"><strong>${fmt(best.cost)} kr</strong></td></tr>`;
+      const bought = plan => [...plan.buy.entries()].reduce((a,[b,n])=>a+n*b.l,0);
+      const meta = (plan,extra) => `<div class="k-sub">${extra||''}offcut ≈ ${fmtLen(bought(plan)-totalRun)} cm</div>`;
+      const boardOf = plan => [...plan.buy.keys()][0];
+
+      /* extra tiers under the main plan, merged when they coincide */
+      const tiers=[]; let mainNote='';
+      if(bestIsSingle){
+        if(boardOf(best)===r.rate) mainNote='cheapest · single length · best kr/m², all in one · ';
+        else{
+          mainNote='cheapest &amp; single length in one · ';
+          if(r.ratePlan) tiers.push({label:'best kr/m² board only:', plan:r.ratePlan});
+          else tiers.push({msg:`best kr/m² board (${r.rate.l}×${r.rate.w}) is too short for some pieces`});
+        }
+      } else if(single){
+        if(boardOf(single)===r.rate) tiers.push({label:'single length only (also the best kr/m² board):', plan:single});
+        else{
+          tiers.push({label:'single length only:', plan:single});
+          if(r.ratePlan) tiers.push({label:'best kr/m² board only:', plan:r.ratePlan});
+          else tiers.push({msg:`best kr/m² board (${r.rate.l}×${r.rate.w}) is too short for some pieces`});
+        }
+      } else tiers.push({msg:'no single-length option covers every piece'});
+
+      const storeCell = `<td rowspan="${1+tiers.length}"><span class="store-${storeCls(r.s)}">${storeName(r.s)}</span>${win?' 🏆':''}</td>`;
+      const main = `<tr class="${tiers.length?'has-alt':''}${win}">${storeCell}`
+        + `<td>${fmtBuy(best)}${meta(best, mainNote)}</td>`
+        + `<td class="num"><strong>${fmt(best.cost)} kr</strong></td></tr>`;
+      const alts = tiers.map((t,i)=>
+        `<tr class="k-alt${win}${i<tiers.length-1?' has-alt':''}">`
+        + (t.plan
+            ? `<td><span class="k-sub">${t.label}</span><br>${fmtBuy(t.plan)}${meta(t.plan)}</td><td class="num">${fmt(t.plan.cost)} kr</td>`
+            : `<td><span class="k-sub">${t.msg}</span></td><td class="num">—</td>`)
+        + `</tr>`).join('');
+      return main + alts;
     }).join('');
   kEl('k-note').textContent = anyPlan
     ? 'Board counts are a greedy cutting estimate (first-fit, 3 mm kerf) — a clever layout at the saw might save a board.'
@@ -770,6 +914,12 @@ function renderKallax(){
 
 kDepthOptions();
 ['k-ow','k-oh','k-depth'].forEach(id=>kEl(id).addEventListener('input', renderKallax));
+let kComp=false;
+kEl('k-comp').addEventListener('click', ()=>{
+  kComp=!kComp;
+  kEl('k-comp').setAttribute('aria-pressed', kComp);
+  renderKallax();
+});
 kEl('k-sdiv').addEventListener('input', renderKallax);
 kEl('k-tdiv').addEventListener('input', renderKallax);
 kEl('k-cols').addEventListener('input', ()=>{ kMode.col='count'; renderKallax(); });
