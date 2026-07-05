@@ -1,0 +1,784 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Plank Duel — Biltema vs Jula shelf boards</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link href="https://fonts.googleapis.com/css2?family=Bricolage+Grotesque:opsz,wght@12..96,400;12..96,700;12..96,800&family=Archivo:wght@400;500;600&family=IBM+Plex+Mono:wght@400;500;600&display=swap" rel="stylesheet">
+<style>
+  :root{
+    --paper:#f5f0e6;        /* workshop plywood */
+    --ink:#221e17;
+    --ink-soft:#6b6355;
+    --line:#d8cfbd;
+    --biltema:#0071b9;      /* their actual brand blue */
+    --jula:#cb333b;         /* their actual brand red */
+    --obs:#e87722;          /* Obs BYGG orange */
+    --byggmax:#ffd200;      /* Byggmax yellow */
+    --byggmax-ink:#9c7a00;  /* readable Byggmax text tone */
+    --pine-a:#efd9a7; --pine-b:#e0bd7c;
+    --oak-a:#c99a5b;  --oak-b:#a97a3e;
+    --beech-a:#eed3b4; --beech-b:#d9ac80;
+    --win:#2e7d43;
+    --card:#fffdf8;
+  }
+  *{box-sizing:border-box}
+  html{scroll-behavior:smooth}
+  @media (prefers-reduced-motion:reduce){ html{scroll-behavior:auto} *{transition:none!important;animation:none!important} }
+  body{
+    margin:0; background:var(--paper); color:var(--ink);
+    font-family:'Archivo',system-ui,sans-serif; font-size:15px; line-height:1.5;
+    background-image:repeating-linear-gradient(90deg, rgba(0,0,0,.015) 0 1px, transparent 1px 90px);
+  }
+  .wrap{max-width:980px; margin:0 auto; padding:0 20px 90px}
+
+  /* ---------- header ---------- */
+  header{padding:44px 0 10px}
+  .kicker{font-family:'IBM Plex Mono',monospace; font-size:12px; letter-spacing:.14em; text-transform:uppercase; color:var(--ink-soft)}
+  h1{
+    font-family:'Bricolage Grotesque',sans-serif; font-weight:800;
+    font-size:clamp(34px,6vw,58px); line-height:.98; margin:.15em 0 .3em; letter-spacing:-.01em;
+  }
+  h1 .b{color:var(--biltema)} h1 .j{color:var(--jula)}
+  .sub{max-width:640px; color:var(--ink-soft)}
+
+  .notice{
+    margin:22px 0 0; padding:14px 16px; background:var(--card); border:1px solid var(--line);
+    border-left:4px solid var(--biltema); border-radius:6px; font-size:14px;
+  }
+  .notice strong{font-weight:600}
+
+  /* ---------- summary ---------- */
+  .summary{display:grid; grid-template-columns:repeat(auto-fit,minmax(250px,1fr)); gap:14px; margin:26px 0 6px}
+  @media(max-width:640px){ .summary{grid-template-columns:1fr} }
+  .sumcard{background:var(--card); border:1px solid var(--line); border-radius:8px; padding:16px 18px}
+  .sumcard h3{margin:0 0 8px; font-family:'Bricolage Grotesque',sans-serif; font-size:16px; font-weight:700}
+  .sumcard .row{display:flex; justify-content:space-between; gap:10px; font-family:'IBM Plex Mono',monospace; font-size:13px; padding:4px 0; border-top:1px dashed var(--line)}
+  .sumcard .row:first-of-type{border-top:none}
+  .store-b{color:var(--biltema); font-weight:600} .store-j{color:var(--jula); font-weight:600} .store-o{color:var(--obs); font-weight:600} .store-x{color:var(--byggmax-ink); font-weight:600}
+
+  /* ---------- controls ---------- */
+  .controls{
+    position:sticky; top:0; z-index:5; display:flex; flex-wrap:wrap; gap:10px; align-items:center;
+    padding:12px 0; margin-top:18px; background:linear-gradient(var(--paper) 82%, transparent);
+  }
+  .seg{display:flex; border:1px solid var(--ink); border-radius:6px; overflow:hidden; background:var(--card)}
+  .seg button{
+    appearance:none; border:0; background:transparent; padding:8px 14px; cursor:pointer;
+    font-family:'IBM Plex Mono',monospace; font-size:13px; color:var(--ink);
+  }
+  .seg button+button{border-left:1px solid var(--line)}
+  .seg button[aria-pressed="true"]{background:var(--ink); color:var(--paper)}
+  .seg button:focus-visible, select:focus-visible, .price-in:focus-visible, a:focus-visible{outline:3px solid var(--biltema); outline-offset:2px}
+  label.sel{font-family:'IBM Plex Mono',monospace; font-size:13px; color:var(--ink-soft); display:flex; align-items:center; gap:8px}
+  select{
+    font-family:'IBM Plex Mono',monospace; font-size:13px; padding:8px 10px;
+    border:1px solid var(--ink); border-radius:6px; background:var(--card); color:var(--ink);
+  }
+
+  /* ---------- plank list ---------- */
+  .group-h{
+    display:flex; align-items:baseline; gap:12px; margin:30px 0 6px;
+    font-family:'Bricolage Grotesque',sans-serif; font-weight:800; font-size:24px;
+  }
+  .group-h .swatch{width:26px; height:14px; border-radius:3px; border:1px solid rgba(0,0,0,.25)}
+  .group-h small{font-family:'IBM Plex Mono',monospace; font-weight:400; font-size:12px; color:var(--ink-soft)}
+
+  .plank{
+    display:grid; grid-template-columns:86px 1fr 220px; gap:14px; align-items:center;
+    background:var(--card); border:1px solid var(--line); border-radius:8px;
+    padding:12px 14px; margin:8px 0; transition:border-color .15s;
+  }
+  .plank:hover{border-color:var(--ink)}
+  .plank.best{border:2px solid var(--win)}
+  @media(max-width:720px){ .plank{grid-template-columns:70px 1fr; } .right{grid-column:1/-1; justify-content:space-between} }
+
+  .storechip{
+    font-family:'IBM Plex Mono',monospace; font-size:11px; font-weight:600; letter-spacing:.06em;
+    padding:4px 0; text-align:center; border-radius:4px; color:#fff;
+  }
+  .storechip.b{background:var(--biltema)} .storechip.j{background:var(--jula)} .storechip.o{background:var(--obs)}
+  .storechip.x{background:var(--byggmax); color:#1e1c17}
+
+  .mid{min-width:0}
+  .board-track{position:relative; height:38px; display:flex; align-items:center}
+  .board{
+    border-radius:2px; border:1px solid rgba(0,0,0,.28);
+    box-shadow:inset 0 -3px 0 rgba(0,0,0,.12), inset 0 2px 0 rgba(255,255,255,.35);
+    min-width:14px;
+  }
+  .board.pine{background:repeating-linear-gradient(90deg,var(--pine-a) 0 22px, var(--pine-b) 22px 26px)}
+  .board.oak{background:repeating-linear-gradient(90deg,var(--oak-a) 0 30px, var(--oak-b) 30px 35px)}
+  .board.beech{background:repeating-linear-gradient(90deg,var(--beech-a) 0 26px, var(--beech-b) 26px 30px)}
+  .dims{font-family:'IBM Plex Mono',monospace; font-size:13px; margin-top:3px; display:flex; gap:10px; flex-wrap:wrap; align-items:baseline}
+  .dims .size{font-weight:600}
+  .tag{font-size:10.5px; padding:2px 6px; border:1px solid var(--line); border-radius:99px; color:var(--ink-soft); background:var(--paper)}
+  .tag.sale{border-color:var(--win); color:var(--win)}
+  .tag.wood-pine{background:var(--pine-a); color:var(--ink); border-color:var(--pine-b)}
+  .tag.wood-oak{background:var(--oak-a); color:#fff; border-color:var(--oak-b)}
+  .tag.wood-beech{background:var(--beech-a); color:var(--ink); border-color:var(--beech-b)}
+
+  .right{display:flex; align-items:center; justify-content:flex-end; gap:12px}
+  .price{font-family:'IBM Plex Mono',monospace; text-align:right}
+  .price .kr{font-size:17px; font-weight:600}
+  .price .sqm{display:block; font-size:11.5px; color:var(--ink-soft)}
+  .price .sqm.winner{color:var(--win); font-weight:600}
+  .price .was{font-size:11px; color:var(--ink-soft); text-decoration:line-through; display:block}
+  .price-in{
+    width:84px; padding:7px 8px; font-family:'IBM Plex Mono',monospace; font-size:14px;
+    border:1.5px dashed var(--biltema); border-radius:6px; background:#eef6fc; color:var(--ink); text-align:right;
+  }
+  .price-in::placeholder{color:#7fa8c4}
+  a.plink{
+    font-family:'IBM Plex Mono',monospace; font-size:12px; color:var(--ink); text-decoration:none;
+    border:1px solid var(--ink); border-radius:6px; padding:6px 9px; white-space:nowrap; background:var(--card);
+  }
+  a.plink:hover{background:var(--ink); color:var(--paper)}
+
+  footer{margin-top:56px; font-size:12.5px; color:var(--ink-soft); border-top:1px solid var(--line); padding-top:16px}
+  footer a{color:inherit}
+
+  /* ---------- tabs ---------- */
+  .tabs{display:flex; gap:8px; margin-top:26px}
+  .tabs button{
+    appearance:none; cursor:pointer; padding:10px 18px; border:1px solid var(--ink); border-bottom-width:3px;
+    border-radius:8px 8px 0 0; background:var(--card); color:var(--ink);
+    font-family:'Bricolage Grotesque',sans-serif; font-weight:700; font-size:15px;
+  }
+  .tabs button[aria-pressed="true"]{background:var(--ink); color:var(--paper)}
+  .tabs button:focus-visible{outline:3px solid var(--biltema); outline-offset:2px}
+
+  /* ---------- kallax planner ---------- */
+  .k-layout{display:grid; grid-template-columns:280px 1fr; gap:18px; margin-top:22px}
+  @media(max-width:760px){ .k-layout{grid-template-columns:1fr} }
+  .k-inputs{background:var(--card); border:1px solid var(--line); border-radius:8px; padding:16px 18px; align-self:start}
+  .k-inputs h3, .k-card h3{margin:0 0 10px; font-family:'Bricolage Grotesque',sans-serif; font-size:16px; font-weight:700}
+  .k-inputs label{display:flex; justify-content:space-between; align-items:center; gap:10px; font-family:'IBM Plex Mono',monospace; font-size:13px; padding:6px 0; border-top:1px dashed var(--line)}
+  .k-inputs label:first-of-type{border-top:none}
+  .k-inputs input[type=number]{
+    width:76px; padding:6px 8px; text-align:right; font-family:'IBM Plex Mono',monospace; font-size:14px;
+    border:1px solid var(--ink); border-radius:6px; background:var(--paper); color:var(--ink);
+  }
+  .duo{display:flex; gap:6px}
+  .duo input{width:64px}
+  .duo.sync input.drives{border-width:2px; background:var(--card)}
+  .duo.sync input:not(.drives){border-style:dashed; border-color:var(--ink-soft); color:var(--ink-soft)}
+  .k-inputs select{max-width:130px}
+  .k-hint{font-size:12px; color:var(--ink-soft); margin-top:10px; line-height:1.45}
+  .k-card{background:var(--card); border:1px solid var(--line); border-radius:8px; padding:16px 18px; margin-bottom:18px}
+  #k-svg{width:100%; height:auto; display:block}
+  .k-dims{font-family:'IBM Plex Mono',monospace; font-size:13px; margin-top:8px; color:var(--ink-soft)}
+  table.k-table{width:100%; border-collapse:collapse; font-family:'IBM Plex Mono',monospace; font-size:13px}
+  table.k-table th{font-family:'Archivo',sans-serif; font-size:12px; text-transform:uppercase; letter-spacing:.06em; color:var(--ink-soft); text-align:left; padding:6px 8px; border-bottom:1px solid var(--ink)}
+  table.k-table td{padding:7px 8px; border-bottom:1px dashed var(--line); vertical-align:top}
+  table.k-table td.num{text-align:right; white-space:nowrap}
+  tr.k-win td{background:#eaf4ec}
+  .k-warn{margin-top:10px; padding:10px 12px; border:1px solid var(--jula); border-radius:6px; color:var(--jula); font-size:13px}
+</style>
+</head>
+<body>
+<div class="wrap">
+
+  <header>
+    <div class="kicker">Shelf boards · hylleplater · solid pine &amp; oak</div>
+    <h1>Plank duel: <span class="b">Biltema</span> · <span class="j">Jula</span> · <span class="o">Obs&nbsp;BYGG</span> · <span style="color:var(--byggmax-ink)">Byggmax</span></h1>
+    <p class="sub">Every solid-wood shelf board the four chains sell, drawn to scale, priced per board and per square metre — because each store cuts its planks to a different size grid, kr/m² is the honest way to compare them.</p>
+    <div class="notice">
+      <strong>Data snapshot:</strong> Jula prices captured from jula.no on 2 July 2026; Biltema and Obs BYGG prices from their Bærum store listings, and Byggmax prices from byggmax.no, 3–4 July 2026. Obs BYGG's boards are Moelven hobbyplater and Byggmax's are Edwood/own-brand hobbyplater — glue-laminated untreated wood, same construction class as the others' shelves. Every board is priced; the only second-hand figure is Jula's 200×20 oak (399 kr via Prisjakt).
+    </div>
+  </header>
+
+  <nav class="tabs" aria-label="Sections">
+    <button data-tab="compare" aria-pressed="true">Compare boards</button>
+    <button data-tab="kallax" aria-pressed="false">Kallax planner</button>
+  </nav>
+
+  <section id="tab-compare">
+
+  <div class="summary">
+    <div class="sumcard">
+      <h3>🌲 Pine — cheapest per m²</h3>
+      <div id="sum-pine"></div>
+    </div>
+    <div class="sumcard">
+      <h3>🌰 Oak — cheapest per m²</h3>
+      <div id="sum-oak"></div>
+    </div>
+    <div class="sumcard">
+      <h3>🍂 Beech — cheapest per m²</h3>
+      <div id="sum-beech"></div>
+    </div>
+  </div>
+
+  <div class="controls">
+    <div class="seg" role="group" aria-label="Wood filter">
+      <button data-wood="all" aria-pressed="true">All</button>
+      <button data-wood="pine" aria-pressed="false">Pine (furu)</button>
+      <button data-wood="oak" aria-pressed="false">Oak (eik)</button>
+      <button data-wood="beech" aria-pressed="false">Beech (bøk)</button>
+    </div>
+    <div class="seg" role="group" aria-label="Store filter">
+      <button data-store="all" aria-pressed="true">All stores</button>
+      <button data-store="B" aria-pressed="false">Biltema</button>
+      <button data-store="J" aria-pressed="false">Jula</button>
+      <button data-store="O" aria-pressed="false">Obs BYGG</button>
+      <button data-store="X" aria-pressed="false">Byggmax</button>
+    </div>
+    <div class="seg" role="group" aria-label="Grouping">
+      <button data-group="wood" aria-pressed="true">By wood</button>
+      <button data-group="flat" aria-pressed="false">One list</button>
+    </div>
+    <label class="sel">width
+      <select id="width"></select>
+    </label>
+    <label class="sel">sort
+      <select id="sort">
+        <option value="sqm">kr / m² (cheapest first)</option>
+        <option value="price">price (lowest first)</option>
+        <option value="area">size (smallest first)</option>
+        <option value="length">length</option>
+      </select>
+    </label>
+  </div>
+
+  <div id="list"></div>
+
+  </section>
+
+  <section id="tab-kallax" hidden>
+    <div class="k-layout">
+      <div class="k-inputs">
+        <h3>Your grid</h3>
+        <label>columns · total width (cm)
+          <span class="duo sync"><input id="k-cols" type="number" min="1" max="12" step="1" value="4" aria-label="Number of columns"><input id="k-wtot" type="number" min="10" max="1000" step="0.5" value="141" aria-label="Total width in centimetres"></span>
+        </label>
+        <label>rows · total height (cm)
+          <span class="duo sync"><input id="k-rows" type="number" min="1" max="12" step="1" value="2" aria-label="Number of rows"><input id="k-htot" type="number" min="10" max="1000" step="0.5" value="71.4" aria-label="Total height in centimetres"></span>
+        </label>
+        <label>opening width (cm) <input id="k-ow" type="number" min="5" max="120" step="0.5" value="33"></label>
+        <label>opening height (cm) <input id="k-oh" type="number" min="5" max="120" step="0.5" value="33"></label>
+        <label>divisions · top / side
+          <span class="duo"><input id="k-tdiv" type="number" min="0" max="5" step="1" value="1" aria-label="Top-section dividers (0 to 5)"><input id="k-sdiv" type="number" min="0" max="5" step="1" value="2" aria-label="Side-column shelves (0 to 5)"></span>
+        </label>
+        <label>wood
+          <select id="k-wood"><option value="pine">pine (furu)</option><option value="oak">oak (eik)</option><option value="beech">beech (bøk)</option></select>
+        </label>
+        <label>depth = board width
+          <select id="k-depth"></select>
+        </label>
+        <p class="k-hint">Each pair works both ways: the field you edited last (solid border) governs, the other (dashed) shows the result. A count sets the total cm; a total cm computes the count as ⌊(total − 1,8) / (opening + 1,8)⌋ with spare cm reported — spare <em>height</em> of ≥ 1 cm usable opening becomes a shorter top section with 0–5 evenly spaced dividers, and spare <em>width</em> becomes a narrow full-height side column with 0–5 evenly spaced shelves (the "divisions" inputs above). Construction: top and bottom boards run the full outer width; the sides stand on the bottom board, sandwiched under the top for rigidity; middle shelves fit between the sides; short dividers fill each row. Boards are 1,8&nbsp;cm thick; the shopping plan reserves a 3&nbsp;mm saw kerf per cut. IKEA's Kallax opening is ≈33×33&nbsp;cm at 39&nbsp;cm depth, so 40&nbsp;cm boards are the closest match.</p>
+      </div>
+
+      <div>
+        <div class="k-card">
+          <h3>Front view · to scale</h3>
+          <svg id="k-svg" xmlns="http://www.w3.org/2000/svg" role="img" aria-label="Scaled drawing of the shelf grid"></svg>
+          <div class="k-dims" id="k-dims"></div>
+        </div>
+
+        <div class="k-card">
+          <h3>Cut list</h3>
+          <table class="k-table" id="k-cuts"></table>
+        </div>
+
+        <div class="k-card">
+          <h3>Cheapest boards to buy · per store</h3>
+          <table class="k-table" id="k-shop"></table>
+          <div id="k-note" class="k-hint"></div>
+        </div>
+      </div>
+    </div>
+  </section>
+
+  <footer>
+    Jula prices fetched from jula.no on 2 July 2026 (the 200×20&nbsp;cm oak price is via Prisjakt; the 200×30&nbsp;cm pine price was supplied manually, 4 July 2026).
+    Biltema, Obs BYGG and Byggmax prices are from their store/site listings, 3–4 July 2026; boards without their own product link go to the store's category page.
+    All boards are 1,8&nbsp;cm thick unless tagged otherwise — 1,5&nbsp;cm boards are thinner, 2,7&nbsp;cm boards sturdier, so compare kr/m² within the same thickness. Beech (bøk) is Biltema-only; their two largest beech boards were listed without a wood name and were confirmed as beech. Biltema notes its oak is B/C grade and should be oiled promptly; Jula's oak is Hard Head finger-jointed, Jula's pine is FixBoard laminated Swedish pine, Biltema's boards are finger-jointed and untreated, Obs BYGG's are Moelven glue-laminated untreated pine, Byggmax's are Edwood/own-brand hobbyplater.
+    Prices change — verify on
+    <a href="https://www.biltema.no/bygg/oppbevaringshyller/hylleplate/" target="_blank" rel="noopener">biltema.no</a>,
+    <a href="https://www.jula.no/catalog/bygg-og-maling/oppbevaring/hyller/hylleplater/" target="_blank" rel="noopener">jula.no</a>,
+    <a href="https://www.obsbygg.no/bygningsplater/hobbyplater" target="_blank" rel="noopener">obsbygg.no</a> and
+    <a href="https://www.byggmax.no/hobbyplate-furu-p09122" target="_blank" rel="noopener">byggmax.no</a> before buying.
+  </footer>
+</div>
+
+<script>
+/* dataset ----------------------------------------------------------------
+   store: B = Biltema, J = Jula
+   l,w   : cm            t: thickness cm
+   price : NOK, null = unknown (renders an input)
+--------------------------------------------------------------------------*/
+const DATA = [
+  /* ---- Jula pine (FixBoard) ---- */
+  {store:'J', wood:'pine', l:90,  w:20, t:1.8, price:99.90, url:'https://www.jula.no/catalog/bygg-og-maling/oppbevaring/hyller/hylleplater/hylleplate-av-furu-379047/'},
+  {store:'J', wood:'pine', l:90,  w:30, t:1.8, price:129,   url:'https://www.jula.no/catalog/bygg-og-maling/oppbevaring/hyller/hylleplater/hylleplate-av-furu-379048/'},
+  {store:'J', wood:'pine', l:120, w:20, t:1.8, price:129,   url:'https://www.jula.no/catalog/bygg-og-maling/oppbevaring/hyller/hylleplater/hylleplate-av-furu-379049/'},
+  {store:'J', wood:'pine', l:120, w:30, t:1.8, price:149,   url:'https://www.jula.no/catalog/bygg-og-maling/oppbevaring/hyller/hylleplater/hylleplate-av-furu-379050/'},
+  {store:'J', wood:'pine', l:200, w:30, t:1.8, price:249,   url:'https://www.jula.no/catalog/bygg-og-maling/oppbevaring/hyller/hylleplater/hylleplate-av-furu-379063/'},
+  {store:'J', wood:'pine', l:240, w:60, t:1.8, price:449,   url:'https://www.jula.no/catalog/bygg-og-maling/oppbevaring/hyller/hylleplater/hylleplate-av-furu-379073/'},
+
+  /* ---- Jula oak (Hard Head) ---- */
+  {store:'J', wood:'oak', l:80,  w:20, t:1.8, price:179, url:'https://www.jula.no/catalog/bygg-og-maling/oppbevaring/hyller/hylleplater/hylleplater-av-eik-027944/'},
+  {store:'J', wood:'oak', l:80,  w:30, t:1.8, price:229, url:'https://www.jula.no/catalog/bygg-og-maling/oppbevaring/hyller/hylleplater/hylleplater-av-eik-027946/'},
+  {store:'J', wood:'oak', l:80,  w:40, t:1.8, price:299, url:'https://www.jula.no/catalog/bygg-og-maling/oppbevaring/hyller/hylleplater/hylleplater-av-eik-027945/'},
+  {store:'J', wood:'oak', l:120, w:20, t:1.8, price:279, url:'https://www.jula.no/catalog/bygg-og-maling/oppbevaring/hyller/hylleplater/hylleplater-av-eik-027949/'},
+  {store:'J', wood:'oak', l:120, w:30, t:1.8, price:329, url:'https://www.jula.no/catalog/bygg-og-maling/oppbevaring/hyller/hylleplater/hylleplater-av-eik-027947/'},
+  {store:'J', wood:'oak', l:120, w:40, t:1.8, price:449, url:'https://www.jula.no/catalog/bygg-og-maling/oppbevaring/hyller/hylleplater/hylleplater-av-eik-027950/'},
+  {store:'J', wood:'oak', l:200, w:20, t:1.8, price:399, src:'via Prisjakt', url:'https://www.jula.no/catalog/bygg-og-maling/oppbevaring/hyller/hylleplater/hylleplater-av-eik-027948/'},
+  {store:'J', wood:'oak', l:200, w:30, t:1.8, price:549, url:'https://www.jula.no/catalog/bygg-og-maling/oppbevaring/hyller/hylleplater/hylleplater-av-eik-027952/'},
+  {store:'J', wood:'oak', l:200, w:40, t:1.8, price:649, url:'https://www.jula.no/catalog/bygg-og-maling/oppbevaring/hyller/hylleplater/hylleplater-av-eik-027951/'},
+
+  /* ---- Biltema pine (prices: Bærum store listing, 3 Jul 2026) ---- */
+  {store:'B', wood:'pine', l:80,  w:12, t:1.5, price:49.90, url:'https://www.biltema.no/bygg/oppbevaringshyller/hylleplate/hylleplate-furu/'},
+  {store:'B', wood:'pine', l:80,  w:15, t:1.5, price:59.90, url:'https://www.biltema.no/bygg/oppbevaringshyller/hylleplate/hylleplate-furu-80-x-15-x-15-cm-2000058455'},
+  {store:'B', wood:'pine', l:80,  w:18, t:1.5, price:74.90, url:'https://www.biltema.no/bygg/oppbevaringshyller/hylleplate/hylleplate-furu/'},
+  {store:'B', wood:'pine', l:80,  w:20, t:1.8, price:79.90, url:'https://www.biltema.no/bygg/oppbevaringshyller/hylleplate/hylleplate-furu/'},
+  {store:'B', wood:'pine', l:80,  w:25, t:1.8, price:89.90, url:'https://www.biltema.no/bygg/oppbevaringshyller/hylleplate/hylleplate-furu/'},
+  {store:'B', wood:'pine', l:80,  w:30, t:1.5, price:89.90, url:'https://www.biltema.no/bygg/oppbevaringshyller/hylleplate/hylleplate-furu/'},
+  {store:'B', wood:'pine', l:80,  w:30, t:1.8, price:79.90, url:'https://www.biltema.no/bygg/oppbevaringshyller/hylleplate/hylleplate-furu/'},
+  {store:'B', wood:'pine', l:100, w:20, t:1.8, price:89.90, url:'https://www.biltema.no/bygg/oppbevaringshyller/hylleplate/hylleplate-furu/'},
+  {store:'B', wood:'pine', l:100, w:25, t:1.8, price:109,   url:'https://www.biltema.no/bygg/oppbevaringshyller/hylleplate/hylleplate-furu-100-x-25-x-18-cm-2000058437'},
+  {store:'B', wood:'pine', l:100, w:30, t:1.8, price:119,   url:'https://www.biltema.no/bygg/oppbevaringshyller/hylleplate/hylleplate-furu/'},
+  {store:'B', wood:'pine', l:100, w:40, t:1.8, price:129,   url:'https://www.biltema.no/bygg/oppbevaringshyller/hylleplate/hylleplate-furu-100-x-40-x-18-cm-2000058435'},
+  {store:'B', wood:'pine', l:120, w:20, t:1.8, price:99.90, url:'https://www.biltema.no/bygg/oppbevaringshyller/hylleplate/hylleplate-furu-120-x-20-x-18-cm-2000058451'},
+  {store:'B', wood:'pine', l:120, w:25, t:1.8, price:129,   url:'https://www.biltema.no/bygg/oppbevaringshyller/hylleplate/hylleplate-furu/hylleplate-furu-120-x-25-x-18-cm-2000058452'},
+  {store:'B', wood:'pine', l:120, w:30, t:1.8, price:139,   url:'https://www.biltema.no/bygg/oppbevaringshyller/hylleplate/hylleplate-furu/'},
+  {store:'B', wood:'pine', l:120, w:60, t:1.8, price:199,   url:'https://www.biltema.no/bygg/oppbevaringshyller/hylleplate/hylleplate-furu/'},
+  {store:'B', wood:'pine', l:150, w:20, t:1.8, price:109,   url:'https://www.biltema.no/bygg/oppbevaringshyller/hylleplate/hylleplate-furu/'},
+  {store:'B', wood:'pine', l:150, w:30, t:1.8, price:139,   url:'https://www.biltema.no/bygg/oppbevaringshyller/hylleplate/hylleplate-furu-150-x-30-x-18-cm-2000058433'},
+  {store:'B', wood:'pine', l:150, w:40, t:1.8, price:189,   url:'https://www.biltema.no/bygg/oppbevaringshyller/hylleplate/hylleplate-furu-150-x-40-x-18-cm-2000058434'},
+  {store:'B', wood:'pine', l:150, w:60, t:1.8, price:269,   url:'https://www.biltema.no/bygg/oppbevaringshyller/hylleplate/hylleplate-furu/'},
+  {store:'B', wood:'pine', l:210, w:20, t:1.8, price:179,   url:'https://www.biltema.no/bygg/oppbevaringshyller/hylleplate/hylleplate-furu/'},
+  {store:'B', wood:'pine', l:210, w:25, t:1.8, price:219,   url:'https://www.biltema.no/bygg/oppbevaringshyller/hylleplate/hylleplate-furu/'},
+  {store:'B', wood:'pine', l:210, w:30, t:1.8, price:239,   url:'https://www.biltema.no/bygg/oppbevaringshyller/hylleplate/hylleplate-furu/'},
+  {store:'B', wood:'pine', l:210, w:40, t:1.8, price:299,   url:'https://www.biltema.no/bygg/oppbevaringshyller/hylleplate/hylleplate-furu-210-x-40-x-18-cm-2000058448'},
+  {store:'B', wood:'pine', l:210, w:50, t:1.8, price:379,   url:'https://www.biltema.no/bygg/oppbevaringshyller/hylleplate/hylleplate-furu/'},
+  {store:'B', wood:'pine', l:240, w:20, t:1.8, price:199,   url:'https://www.biltema.no/bygg/oppbevaringshyller/hylleplate/hylleplate-furu-240-x-20-x-18-cm-2000058439'},
+  {store:'B', wood:'pine', l:240, w:30, t:1.8, price:219,   url:'https://www.biltema.no/bygg/oppbevaringshyller/hylleplate/hylleplate-furu/'},
+  {store:'B', wood:'pine', l:240, w:40, t:1.8, price:379,   url:'https://www.biltema.no/bygg/oppbevaringshyller/hylleplate/hylleplate-furu-240-x-40-x-18-cm-2000058441'},
+  {store:'B', wood:'pine', l:240, w:60, t:1.8, price:459,   url:'https://www.biltema.no/bygg/oppbevaringshyller/hylleplate/hylleplate-furu/hylleplate-furu-240-x-60-x-18-cm-2000058442'},
+  {store:'B', wood:'pine', l:210, w:40, t:2.7, price:429,   url:'https://www.biltema.no/bygg/oppbevaringshyller/hylleplate/hylleplate-furu/'},
+  {store:'B', wood:'pine', l:210, w:60, t:2.7, price:599,   url:'https://www.biltema.no/bygg/oppbevaringshyller/hylleplate/hylleplate-furu/'},
+  {store:'B', wood:'pine', l:210, w:90, t:2.7, price:799,   url:'https://www.biltema.no/bygg/oppbevaringshyller/hylleplate/hylleplate-furu/'},
+  {store:'B', wood:'pine', l:240, w:20, t:2.7, price:299,   url:'https://www.biltema.no/bygg/oppbevaringshyller/hylleplate/hylleplate-furu/'},
+  {store:'B', wood:'pine', l:240, w:30, t:2.7, price:389,   url:'https://www.biltema.no/bygg/oppbevaringshyller/hylleplate/hylleplate-furu/'},
+  {store:'B', wood:'pine', l:240, w:40, t:2.7, price:459,   url:'https://www.biltema.no/bygg/oppbevaringshyller/hylleplate/hylleplate-furu/hylleplate-furu-240-x-40-x-27-cm-2000058443'},
+  {store:'B', wood:'pine', l:240, w:60, t:2.7, price:649,   url:'https://www.biltema.no/bygg/oppbevaringshyller/hylleplate/hylleplate-furu/hylleplate-furu-240-x-60-x-27-cm-2000058444'},
+
+  /* ---- Biltema oak ---- */
+  {store:'B', wood:'oak', l:100, w:20, t:1.8, price:179,  url:'https://www.biltema.no/bygg/oppbevaringshyller/hylleplate/hylleplate-eik/'},
+  {store:'B', wood:'oak', l:100, w:30, t:1.8, price:279,  url:'https://www.biltema.no/bygg/oppbevaringshyller/hylleplate/hylleplate-eik-100-x-30-x-18-cm-2000053492'},
+  {store:'B', wood:'oak', l:100, w:40, t:1.8, price:359,  url:'https://www.biltema.no/bygg/oppbevaringshyller/hylleplate/hylleplate-eik/'},
+  {store:'B', wood:'oak', l:120, w:30, t:1.8, price:249,  url:'https://www.biltema.no/bygg/oppbevaringshyller/hylleplate/hylleplate-eik/'},
+  {store:'B', wood:'oak', l:120, w:40, t:1.8, price:449,  url:'https://www.biltema.no/bygg/oppbevaringshyller/hylleplate/hylleplate-eik-120-x-40-cm-2000058423'},
+  {store:'B', wood:'oak', l:120, w:60, t:1.8, price:649,  url:'https://www.biltema.no/bygg/oppbevaringshyller/hylleplate/hylleplate-eik-120-x-60-cm-2000058426'},
+  {store:'B', wood:'oak', l:150, w:30, t:1.8, price:369,  url:'https://www.biltema.no/bygg/oppbevaringshyller/hylleplate/hylleplate-eik-150-x-30-x-18-cm-2000053493'},
+  {store:'B', wood:'oak', l:150, w:40, t:1.8, price:489,  url:'https://www.biltema.no/bygg/oppbevaringshyller/hylleplate/hylleplate-eik/'},
+  {store:'B', wood:'oak', l:150, w:60, t:1.8, price:699,  url:'https://www.biltema.no/bygg/oppbevaringshyller/hylleplate/hylleplate-eik/'},
+  {store:'B', wood:'oak', l:210, w:30, t:1.8, price:499,  url:'https://www.biltema.no/bygg/oppbevaringshyller/hylleplate/hylleplate-eik-210-x-30-x-18-cm-2000053494'},
+  {store:'B', wood:'oak', l:210, w:40, t:1.8, price:599,  url:'https://www.biltema.no/bygg/oppbevaringshyller/hylleplate/hylleplate-eik/hylleplate-eik-210-x-40-cm-2000058424'},
+  {store:'B', wood:'oak', l:210, w:60, t:1.8, price:879,  url:'https://www.biltema.no/bygg/oppbevaringshyller/hylleplate/hylleplate-eik-210-x-60-cm-2000058425'},
+  {store:'B', wood:'oak', l:240, w:30, t:1.8, price:549,  url:'https://www.biltema.no/bygg/oppbevaringshyller/hylleplate/hylleplate-eik/'},
+  {store:'B', wood:'oak', l:240, w:40, t:1.8, price:749,  url:'https://www.biltema.no/bygg/oppbevaringshyller/hylleplate/hylleplate-eik/'},
+  {store:'B', wood:'oak', l:240, w:60, t:1.8, price:1299, url:'https://www.biltema.no/bygg/oppbevaringshyller/hylleplate/hylleplate-eik/'},
+
+  /* ---- Biltema beech (bøk; Bærum listing 3 Jul 2026; the 210x40 & 210x60 were
+         listed without a wood name but sit in the beech 47-095x article series) ---- */
+  {store:'B', wood:'beech', l:100, w:30, t:1.8, price:229, url:'https://www.biltema.no/bygg/oppbevaringshyller/hylleplate/'},
+  {store:'B', wood:'beech', l:120, w:40, t:1.8, price:399, url:'https://www.biltema.no/bygg/oppbevaringshyller/hylleplate/'},
+  {store:'B', wood:'beech', l:120, w:60, t:1.8, price:449, url:'https://www.biltema.no/bygg/oppbevaringshyller/hylleplate/'},
+  {store:'B', wood:'beech', l:150, w:30, t:1.8, price:299, url:'https://www.biltema.no/bygg/oppbevaringshyller/hylleplate/'},
+  {store:'B', wood:'beech', l:210, w:30, t:1.8, price:349, url:'https://www.biltema.no/bygg/oppbevaringshyller/hylleplate/'},
+  {store:'B', wood:'beech', l:210, w:40, t:1.8, price:499, url:'https://www.biltema.no/bygg/oppbevaringshyller/hylleplate/'},
+  {store:'B', wood:'beech', l:210, w:60, t:1.8, price:699, url:'https://www.biltema.no/bygg/oppbevaringshyller/hylleplate/'},
+  /* ---- Obs BYGG pine (Moelven hobbyplate, untreated glue-laminated, 18 mm; Bærum listing 4 Jul 2026) ---- */
+  {store:'O', wood:'pine', l:80,  w:20, t:1.8, price:169, url:'https://www.obsbygg.no/bygningsplater/hobbyplater'},
+  {store:'O', wood:'pine', l:80,  w:30, t:1.8, price:199, url:'https://www.obsbygg.no/bygningsplater/hobbyplater'},
+  {store:'O', wood:'pine', l:120, w:20, t:1.8, price:169, url:'https://www.obsbygg.no/bygningsplater/hobbyplater'},
+  {store:'O', wood:'pine', l:120, w:25, t:1.8, price:199, url:'https://www.obsbygg.no/bygningsplater/hobbyplater'},
+  {store:'O', wood:'pine', l:120, w:30, t:1.8, price:259, url:'https://www.obsbygg.no/bygningsplater/hobbyplater'},
+  {store:'O', wood:'pine', l:120, w:40, t:1.8, price:349, url:'https://www.obsbygg.no/bygningsplater/hobbyplater'},
+  {store:'O', wood:'pine', l:120, w:50, t:1.8, price:459, url:'https://www.obsbygg.no/bygningsplater/hobbyplater'},
+  {store:'O', wood:'pine', l:240, w:20, t:1.8, price:299, url:'https://www.obsbygg.no/bygningsplater/hobbyplater'},
+  {store:'O', wood:'pine', l:240, w:25, t:1.8, price:399, url:'https://www.obsbygg.no/bygningsplater/hobbyplater'},
+  {store:'O', wood:'pine', l:240, w:30, t:1.8, price:399, url:'https://www.obsbygg.no/bygningsplater/hobbyplater'},
+  {store:'O', wood:'pine', l:240, w:40, t:1.8, price:499, url:'https://www.obsbygg.no/bygningsplater/hobbyplater'},
+  {store:'O', wood:'pine', l:240, w:50, t:1.8, price:769, url:'https://www.obsbygg.no/bygningsplater/hobbyplater'},
+  {store:'O', wood:'pine', l:240, w:60, t:1.8, price:719, url:'https://www.obsbygg.no/bygningsplater/hobbyplater'},
+
+  /* ---- Byggmax pine (hobbyplate furu, 18 mm; byggmax.no 4 Jul 2026) ---- */
+  {store:'X', wood:'pine', l:100, w:20, t:1.8, price:120, url:'https://www.byggmax.no/hobbyplate-furu-p09122'},
+  {store:'X', wood:'pine', l:100, w:30, t:1.8, price:129, url:'https://www.byggmax.no/hobbyplate-furu-p09122'},
+  {store:'X', wood:'pine', l:100, w:40, t:1.8, price:139, url:'https://www.byggmax.no/hobbyplate-furu-p09122'},
+  {store:'X', wood:'pine', l:235, w:20, t:1.8, price:219, url:'https://www.byggmax.no/hobbyplate-furu-p09122'},
+  {store:'X', wood:'pine', l:235, w:30, t:1.8, price:239, url:'https://www.byggmax.no/hobbyplate-furu-p09122'},
+  {store:'X', wood:'pine', l:235, w:40, t:1.8, price:399, url:'https://www.byggmax.no/hobbyplate-furu-p09122'},
+  {store:'X', wood:'pine', l:235, w:60, t:1.8, price:499, url:'https://www.byggmax.no/hobbyplate-furu-p09122'},
+
+  /* ---- Byggmax oak (Edwood hobbyplate eik, 18 mm) ---- */
+  {store:'X', wood:'oak', l:120, w:20, t:1.8, price:259, url:'https://www.byggmax.no/hobbyplate-eik-1200-edwood-p091712'},
+  {store:'X', wood:'oak', l:120, w:30, t:1.8, price:339, url:'https://www.byggmax.no/hobbyplate-eik-1200-edwood-p091712'},
+  {store:'X', wood:'oak', l:120, w:40, t:1.8, price:439, url:'https://www.byggmax.no/hobbyplate-eik-1200-edwood-p091712'},
+];
+DATA.forEach((d,i)=>d.id=i);
+
+/* state kept in memory only */
+const state = { wood:'all', store:'all', width:'all', sort:'sqm', group:'wood', prices:{} };
+const matchesWidth = d => state.width==='all' || d.w===+state.width;
+
+const fmt = n => n>=100 ? Math.round(n).toLocaleString('nb-NO') : n.toFixed(2).replace('.',',').replace(',00','');
+const priceOf = d => d.price ?? state.prices[d.id] ?? null;
+const sqm     = d => { const p=priceOf(d); return p ? p/(d.l/100*d.w/100) : null; };
+const storeName = s => ({B:'BILTEMA', J:'JULA', O:'OBS BYGG', X:'BYGGMAX'})[s];
+const storeCls  = s => ({B:'b', J:'j', O:'o', X:'x'})[s];
+
+const WOODS=['pine','oak','beech'];
+const woodLabel={pine:'Pine · furu', oak:'Oak · eik', beech:'Beech · bøk'};
+const woodSwatch={pine:'var(--pine-b)', oak:'var(--oak-b)', beech:'var(--beech-b)'};
+const woodTag={pine:'furu · pine', oak:'eik · oak', beech:'bøk · beech'};
+
+function sortRows(rows){
+  const s = state.sort;
+  return rows.slice().sort((a,b)=>{
+    if(s==='sqm'){ const A=sqm(a)??1e9, B=sqm(b)??1e9; return A-B; }
+    if(s==='price'){ const A=priceOf(a)??1e9, B=priceOf(b)??1e9; return A-B; }
+    if(s==='area'){ return a.l*a.w - b.l*b.w; }
+    return a.l-b.l || a.w-b.w;
+  });
+}
+
+function bestIds(){
+  /* cheapest known kr/m² per wood type (1.8 cm boards only, within the active width filter) */
+  const best={};
+  for(const wood of WOODS){
+    let min=Infinity, id=null;
+    DATA.filter(d=>d.wood===wood && d.t===1.8 && matchesWidth(d)).forEach(d=>{
+      const v=sqm(d); if(v!==null && v<min){min=v; id=d.id;}
+    });
+    if(id!==null) best[wood]=id;
+  }
+  return best;
+}
+
+function render(){
+  const best = bestIds();
+  const list = document.getElementById('list');
+  list.innerHTML='';
+  const flat = state.group==='flat';
+  for(const wood of (flat ? ['all'] : WOODS)){
+    if(!flat && state.wood!=='all' && state.wood!==wood) continue;
+    let rows = DATA.filter(d=>(flat || d.wood===wood) && (state.wood==='all' || d.wood===state.wood) && matchesWidth(d));
+    if(state.store!=='all') rows = rows.filter(d=>d.store===state.store);
+    if(!rows.length) continue;
+
+    const h=document.createElement('div');
+    h.className='group-h';
+    h.innerHTML=`<span class="swatch" style="background:${flat?'linear-gradient(90deg,var(--pine-b),var(--beech-b),var(--oak-b))':woodSwatch[wood]}"></span>
+      ${flat?'All woods, one ranking':woodLabel[wood]}
+      <small>${rows.length} boards · bars drawn to scale</small>`;
+    list.appendChild(h);
+
+    for(const d of sortRows(rows)){
+      const p=priceOf(d), v=sqm(d);
+      const el=document.createElement('div');
+      el.className='plank'+(best[d.wood]===d.id?' best':'');
+      const barW = 8 + (d.l/240)*84;                 /* % of track */
+      const barH = 8 + ((d.w-12)/78)*28;             /* px, widths span 12–90 cm */
+      el.innerHTML=`
+        <span class="storechip ${storeCls(d.store)}">${storeName(d.store)}</span>
+        <div class="mid">
+          <div class="board-track"><div class="board ${d.wood}" style="width:${barW}%;height:${barH}px" title="${d.l}×${d.w} cm"></div></div>
+          <div class="dims">
+            <span class="size">${d.l} × ${d.w} cm</span>
+            <span class="tag wood-${d.wood}">${woodTag[d.wood]}</span>
+            ${d.t!==1.8?`<span class="tag">${String(d.t).replace('.',',')} cm thick</span>`:''}
+            ${d.was?`<span class="tag sale">sale — was ${d.was},-</span>`:''}
+            ${d.src?`<span class="tag">${d.src}</span>`:''}
+          </div>
+        </div>
+        <div class="right">
+          ${ d.price!==null ? `
+            <span class="price">
+              ${d.was?`<span class="was">${fmt(d.was)} kr</span>`:''}
+              <span class="kr">${fmt(p)} kr</span>
+              <span class="sqm ${best[d.wood]===d.id?'winner':''}">${fmt(v)} kr/m²${best[d.wood]===d.id?(' · cheapest '+woodTag[d.wood].split(' ')[0]):''}</span>
+            </span>` : `
+            <span class="price">
+              <input class="price-in" type="number" min="0" step="1" inputmode="decimal"
+                     placeholder="kr?" value="${state.prices[d.id]??''}" data-id="${d.id}"
+                     aria-label="Price in kroner for ${storeName(d.store)} ${d.l} by ${d.w} cm ${d.wood} board">
+              <span class="sqm ${best[d.wood]===d.id?'winner':''}">${v?fmt(v)+' kr/m²'+(best[d.wood]===d.id?' · cheapest':''):'— kr/m²'}</span>
+            </span>`}
+          <a class="plink" href="${d.url}" target="_blank" rel="noopener">open ↗</a>
+        </div>`;
+      list.appendChild(el);
+    }
+  }
+  renderSummary(best);
+  list.querySelectorAll('.price-in').forEach(inp=>{
+    inp.addEventListener('change', e=>{
+      const v=parseFloat(e.target.value);
+      state.prices[e.target.dataset.id] = (isFinite(v)&&v>0)?v:undefined;
+      render();
+    });
+  });
+}
+
+function renderSummary(best){
+  for(const wood of WOODS){
+    const box=document.getElementById('sum-'+wood);
+    const rows=[];
+    for(const s of ['B','J','O','X']){
+      if(!DATA.some(d=>d.wood===wood && d.store===s)) continue; /* store doesn't sell this wood */
+      let min=Infinity, hit=null;
+      DATA.filter(d=>d.wood===wood && d.store===s && d.t===1.8 && matchesWidth(d)).forEach(d=>{
+        const v=sqm(d); if(v!==null&&v<min){min=v;hit=d;}
+      });
+      rows.push(hit
+        ? `<div class="row"><span class="store-${storeCls(s)}">${storeName(s)}</span><span>${hit.l}×${hit.w} · ${fmt(priceOf(hit))} kr → <strong>${fmt(min)} kr/m²</strong></span></div>`
+        : `<div class="row"><span class="store-${storeCls(s)}">${storeName(s)}</span><span>no board in this width</span></div>`);
+    }
+    box.innerHTML=rows.join('');
+  }
+}
+
+/* controls */
+document.querySelectorAll('[data-wood]').forEach(b=>b.addEventListener('click',()=>{
+  state.wood=b.dataset.wood;
+  document.querySelectorAll('[data-wood]').forEach(x=>x.setAttribute('aria-pressed', x===b));
+  render();
+}));
+document.querySelectorAll('[data-store]').forEach(b=>b.addEventListener('click',()=>{
+  state.store=b.dataset.store;
+  document.querySelectorAll('[data-store]').forEach(x=>x.setAttribute('aria-pressed', x===b));
+  render();
+}));
+document.querySelectorAll('[data-group]').forEach(b=>b.addEventListener('click',()=>{
+  state.group=b.dataset.group;
+  document.querySelectorAll('[data-group]').forEach(x=>x.setAttribute('aria-pressed', x===b));
+  render();
+}));
+function setGroup(g){
+  state.group=g;
+  document.querySelectorAll('[data-group]').forEach(x=>x.setAttribute('aria-pressed', x.dataset.group===g));
+}
+document.getElementById('sort').addEventListener('change',e=>{
+  state.sort=e.target.value;
+  if(state.sort==='price') setGroup('flat');   /* cheapest-first ranks all woods together */
+  render();
+});
+
+/* width dropdown, built from the widths that actually exist */
+const widthSel = document.getElementById('width');
+widthSel.innerHTML = '<option value="all">all widths</option>' +
+  [...new Set(DATA.map(d=>d.w))].sort((a,b)=>a-b).map(w=>`<option value="${w}">${w} cm</option>`).join('');
+widthSel.addEventListener('change',e=>{state.width=e.target.value; render();});
+
+/* ================= tabs ================= */
+document.querySelectorAll('.tabs button').forEach(b=>b.addEventListener('click',()=>{
+  document.querySelectorAll('.tabs button').forEach(x=>x.setAttribute('aria-pressed', x===b));
+  document.getElementById('tab-compare').hidden = b.dataset.tab!=='compare';
+  document.getElementById('tab-kallax').hidden  = b.dataset.tab!=='kallax';
+  if(b.dataset.tab==='kallax') renderKallax();
+}));
+
+/* ================= kallax planner ================= */
+const T = 1.8;          /* board thickness, cm */
+const KERF = 0.3;       /* saw kerf per cut, cm */
+const fmtLen = n => (Math.round(n*10)/10).toString().replace('.',',');
+const kEl = id => document.getElementById(id);
+
+function kDepthOptions(){
+  const wood = kEl('k-wood').value;
+  const widths = [...new Set(DATA.filter(d=>d.wood===wood && d.t===T).map(d=>d.w))].sort((a,b)=>a-b);
+  const cur = kEl('k-depth').value;
+  kEl('k-depth').innerHTML = widths.map(w=>`<option value="${w}">${w} cm</option>`).join('');
+  kEl('k-depth').value = widths.includes(+cur) ? cur : (widths.includes(40) ? '40' : widths[0]);
+}
+
+const kMode = { col:'count', row:'count' };     /* which input of each pair was edited last */
+
+function kGeometry(){
+  const ow=+kEl('k-ow').value||1, oh=+kEl('k-oh').value||1;
+
+  let cols, leftoverW=0, sideW=0;
+  if(kMode.col==='cm'){
+    const W=+kEl('k-wtot').value||1;
+    cols=Math.max(1, Math.floor((W - T)/(ow + T)));
+    const rem=Math.max(0, W - (cols*ow + (cols+1)*T));
+    if(rem - T >= 1) sideW = rem - T;     /* remainder becomes a side column */
+    else leftoverW = rem;
+  } else cols=+kEl('k-cols').value||1;
+
+  let rows, leftoverH=0, topX=0;
+  if(kMode.row==='cm'){
+    const H=+kEl('k-htot').value||1;
+    rows=Math.max(1, Math.floor((H - T)/(oh + T)));
+    const rem=Math.max(0, H - (rows*oh + (rows+1)*T));
+    if(rem - T >= 1) topX = rem - T;      /* remainder becomes a split top section */
+    else leftoverH = rem;
+  } else rows=+kEl('k-rows').value||1;
+
+  const innerW = cols*ow + (cols-1)*T;
+  const outerW = innerW + 2*T + (sideW ? sideW + T : 0);
+  const outerH = rows*oh + (rows+1)*T + (topX ? topX + T : 0);
+  const sideLen = outerH - 2*T;
+  const divVal = id => Math.min(5, Math.max(0, Math.round(+kEl(id).value||0)));
+  let sideDivs = sideW ? divVal('k-sdiv') : 0;
+  while(sideDivs>0 && (sideLen - sideDivs*T)/(sideDivs+1) < 1) sideDivs--;   /* keep openings ≥1 cm */
+  let topDivs = topX ? divVal('k-tdiv') : 0;
+  while(topDivs>0 && (innerW - topDivs*T)/(topDivs+1) < 1) topDivs--;        /* keep openings ≥1 cm */
+  return {cols, rows, ow, oh, innerW, outerW, outerH,
+          sideLen, capLen:outerW,
+          midShelves:rows-1+(topX?1:0), topX, topDivs, sideW, sideDivs, leftoverW, leftoverH};
+}
+
+/* the field that wasn't edited shows the computed result */
+function kSyncInputs(g){
+  const r1=n=>Math.round(n*10)/10;
+  if(kMode.col==='count') kEl('k-wtot').value = r1(g.outerW); else kEl('k-cols').value = g.cols;
+  if(kMode.row==='count') kEl('k-htot').value = r1(g.outerH); else kEl('k-rows').value = g.rows;
+  kEl('k-cols').classList.toggle('drives', kMode.col==='count');
+  kEl('k-wtot').classList.toggle('drives', kMode.col==='cm');
+  kEl('k-rows').classList.toggle('drives', kMode.row==='count');
+  kEl('k-htot').classList.toggle('drives', kMode.row==='cm');
+}
+
+function kPieces(g){
+  return [
+    {name:'Top & bottom (full width)', qty:2, len:g.capLen},
+    {name:'Side panel (between top & bottom)', qty:2, len:g.sideLen},
+    ...(g.midShelves>0 ? [{name:'Middle shelf (between the sides)', qty:g.midShelves, len:g.innerW}] : []),
+    ...(g.topX && g.topDivs>0 ? [{name:'Top-section divider', qty:g.topDivs, len:g.topX}] : []),
+    ...(g.sideW ? [{name:'Side-column wall (full height)', qty:1, len:g.sideLen}] : []),
+    ...(g.sideW && g.sideDivs>0 ? [{name:'Side-column shelf', qty:g.sideDivs, len:g.sideW}] : []),
+    ...(g.cols>1 ? [{name:'Divider', qty:g.rows*(g.cols-1), len:g.oh}] : []),
+  ];
+}
+
+/* greedy bin-packing: first-fit-decreasing, evaluated over several board-choice
+   strategies per store; good in practice, labelled as an estimate */
+function kPlan(pieceList, boards){
+  const pieces=[]; pieceList.forEach(p=>{for(let i=0;i<p.qty;i++)pieces.push(p.len);});
+  pieces.sort((a,b)=>b-a);
+  if(!boards.length || pieces[0] > Math.max(...boards.map(b=>b.l))) return null;
+
+  const run = pick => {
+    const bins=[];
+    for(const p of pieces){
+      const bin = bins.find(x=>x.rem >= p);
+      if(bin){ bin.rem -= p + KERF; continue; }
+      const cands = boards.filter(b=>b.l >= p);
+      if(!cands.length) return null;
+      const b = pick(cands);
+      if(!b || b.l < p) return null;             /* chosen board must actually fit the piece */
+      bins.push({rem: b.l - p - KERF, b});
+    }
+    const buy=new Map(); let cost=0;
+    bins.forEach(x=>{ buy.set(x.b, (buy.get(x.b)||0)+1); cost+=x.b.price; });
+    return {cost, buy};
+  };
+
+  const plans=[];
+  boards.forEach(b0=>{ if(b0.l < pieces[0]) return;                    /* single board type   */
+    const p=run(()=>b0); if(p) plans.push(p); });
+  [c=>c.reduce((a,b)=>a.price<b.price?a:b),                            /* cheapest that fits  */
+   c=>c.reduce((a,b)=>a.price/a.l<b.price/b.l?a:b),                    /* best kr/cm that fits*/
+   c=>c.reduce((a,b)=>a.l>b.l?a:b)                                     /* longest that fits   */
+  ].forEach(pick=>{ const p=run(pick); if(p) plans.push(p); });
+  return plans.length ? plans.reduce((a,b)=>a.cost<=b.cost?a:b) : null;
+}
+
+function drawKallax(g){
+  const svg=kEl('k-svg');
+  const maxW=640, maxH=420, pad=6;
+  const s=Math.min((maxW-2*pad)/g.outerW, (maxH-2*pad)/g.outerH);
+  const W=g.outerW*s, H=g.outerH*s;
+  svg.setAttribute('viewBox',`0 0 ${W+2*pad} ${H+2*pad}`);
+  const wood = kEl('k-wood').value;
+  const fill = ({pine:'#e0bd7c', oak:'#a97a3e', beech:'#d9ac80'})[wood];
+  const r=[];
+  const rect=(x,y,w,h)=>r.push(`<rect x="${(pad+x*s).toFixed(1)}" y="${(pad+y*s).toFixed(1)}" width="${Math.max(w*s,1).toFixed(1)}" height="${Math.max(h*s,1).toFixed(1)}" fill="${fill}" stroke="rgba(0,0,0,.35)" stroke-width=".7"/>`);
+  rect(0,0,g.outerW,T); rect(0,g.outerH-T,g.outerW,T);                       /* top & bottom, full width */
+  rect(0,T,T,g.sideLen); rect(g.outerW-T,T,T,g.sideLen);                     /* sides, sandwiched        */
+  let y0=T;
+  if(g.topX){
+    const opw = (g.innerW - g.topDivs*T)/(g.topDivs+1);
+    for(let k=1;k<=g.topDivs;k++) rect(T + k*opw + (k-1)*T, T, T, g.topX);   /* evenly spaced dividers   */
+    rect(T, T+g.topX, g.innerW, T);                                          /* shelf under top section  */
+    y0 = T + g.topX + T;
+  }
+  if(g.sideW){
+    const xw = T + g.innerW;                                                 /* side-column wall         */
+    rect(xw, T, T, g.sideLen);
+    const oph = (g.sideLen - g.sideDivs*T)/(g.sideDivs+1);
+    for(let k=1;k<=g.sideDivs;k++) rect(xw+T, T + k*oph + (k-1)*T, g.sideW, T);
+  }
+  for(let k=1;k<g.rows;k++) rect(T, y0 + k*(g.oh+T) - T, g.innerW, T);       /* middle shelves           */
+  for(let row=0;row<g.rows;row++) for(let c=1;c<g.cols;c++)                  /* dividers                 */
+    rect(T + c*g.ow + (c-1)*T, y0 + row*(g.oh+T), T, g.oh);
+  svg.innerHTML=r.join('');
+}
+
+function renderKallax(){
+  const g=kGeometry();
+  kSyncInputs(g);
+  drawKallax(g);
+  kEl('k-dims').textContent =
+    `Outer: ${fmtLen(g.outerW)} × ${fmtLen(g.outerH)} cm · ${g.cols} column${g.cols>1?'s':''} × ${g.rows} row${g.rows>1?'s':''} of ${fmtLen(g.ow)} × ${fmtLen(g.oh)} cm openings`
+    + (g.topX ? ` · + a ${fmtLen(g.topX)} cm tall top section with ${g.topDivs} divider${g.topDivs===1?'':'s'} (${g.topDivs+1} opening${g.topDivs?'s':''} of ${fmtLen((g.innerW-g.topDivs*T)/(g.topDivs+1))} × ${fmtLen(g.topX)} cm)` : '')
+    + (g.sideW ? ` · + a ${fmtLen(g.sideW)} cm wide side column with ${g.sideDivs} shel${g.sideDivs===1?'f':'ves'} (${g.sideDivs+1} opening${g.sideDivs?'s':''} of ${fmtLen(g.sideW)} × ${fmtLen((g.sideLen-g.sideDivs*T)/(g.sideDivs+1))} cm)` : '')
+    + (g.leftoverW ? ` · ${fmtLen(g.leftoverW)} cm spare width` : '')
+    + (g.leftoverH ? ` · ${fmtLen(g.leftoverH)} cm spare height` : '');
+
+  /* cut list */
+  const pieces=kPieces(g);
+  const depth=+kEl('k-depth').value;
+  const totalRun=pieces.reduce((a,p)=>a+p.qty*p.len,0);
+  kEl('k-cuts').innerHTML =
+    `<tr><th>piece</th><th>qty</th><th>length</th><th>board width</th></tr>` +
+    pieces.map(p=>`<tr><td>${p.name}</td><td class="num">${p.qty}</td><td class="num">${fmtLen(p.len)} cm</td><td class="num">${depth} cm</td></tr>`).join('') +
+    `<tr><td><strong>Total to cut</strong></td><td class="num"><strong>${pieces.reduce((a,p)=>a+p.qty,0)}</strong></td><td class="num"><strong>${fmtLen(totalRun)} cm</strong></td><td></td></tr>`;
+
+  /* shopping */
+  const wood=kEl('k-wood').value;
+  const rows=[];
+  let anyPlan=false;
+  for(const s of ['B','J','O','X']){
+    const boards=DATA.filter(d=>d.store===s && d.wood===wood && d.w===depth && d.t===T && d.price);
+    if(!boards.length){ rows.push({s, none:true}); continue; }
+    const plan=kPlan(pieces, boards);
+    if(!plan){ rows.push({s, tooShort:true, max:Math.max(...boards.map(b=>b.l))}); continue; }
+    anyPlan=true;
+    rows.push({s, plan});
+  }
+  const priced=rows.filter(r=>r.plan).sort((a,b)=>a.plan.cost-b.plan.cost);
+  const minCost=priced.length?priced[0].plan.cost:null;
+  kEl('k-shop').innerHTML =
+    `<tr><th>store</th><th>buy</th><th>total</th></tr>` +
+    rows.sort((a,b)=>(a.plan?a.plan.cost:1e9)-(b.plan?b.plan.cost:1e9)).map(r=>{
+      if(r.none) return `<tr><td><span class="store-${storeCls(r.s)}">${storeName(r.s)}</span></td><td colspan="2">no ${wood} boards in ${depth} cm width</td></tr>`;
+      if(r.tooShort) return `<tr><td><span class="store-${storeCls(r.s)}">${storeName(r.s)}</span></td><td colspan="2">longest board (${r.max} cm) is shorter than a required piece</td></tr>`;
+      const buyTxt=[...r.plan.buy.entries()].map(([b,n])=>`${n} × ${b.l}×${b.w} (${fmt(b.price)} kr) <a class="plink" href="${b.url}" target="_blank" rel="noopener">↗</a>`).join('<br>');
+      return `<tr class="${r.plan.cost===minCost?'k-win':''}"><td><span class="store-${storeCls(r.s)}">${storeName(r.s)}</span>${r.plan.cost===minCost?' 🏆':''}</td><td>${buyTxt}</td><td class="num"><strong>${fmt(r.plan.cost)} kr</strong></td></tr>`;
+    }).join('');
+  kEl('k-note').textContent = anyPlan
+    ? 'Board counts are a greedy cutting estimate (first-fit, 3 mm kerf) — a clever layout at the saw might save a board.'
+    : 'No store has boards that work for this grid — try a smaller opening width, fewer columns, or another depth.';
+}
+
+kDepthOptions();
+['k-ow','k-oh','k-depth'].forEach(id=>kEl(id).addEventListener('input', renderKallax));
+kEl('k-sdiv').addEventListener('input', renderKallax);
+kEl('k-tdiv').addEventListener('input', renderKallax);
+kEl('k-cols').addEventListener('input', ()=>{ kMode.col='count'; renderKallax(); });
+kEl('k-wtot').addEventListener('input', ()=>{ kMode.col='cm';    renderKallax(); });
+kEl('k-rows').addEventListener('input', ()=>{ kMode.row='count'; renderKallax(); });
+kEl('k-htot').addEventListener('input', ()=>{ kMode.row='cm';    renderKallax(); });
+kEl('k-wood').addEventListener('change', ()=>{ kDepthOptions(); renderKallax(); });
+
+render();
+</script>
+</body>
+</html>
